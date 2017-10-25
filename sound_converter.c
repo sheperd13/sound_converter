@@ -108,14 +108,15 @@ int main(int argc, char** argv){
     fclose(fp);
 
     //START WRITING TO FILE
-    char file_name[strlen(sound_name + 2)];    //allocate array for file name
-    strcpy(file_name, sound_name);  //copy the sound name
+    char file_name[strlen(sound_name + 9)];    //allocate array for file name
+    strcpy(file_name, "output/");  //copy the sound name
+    strcat(file_name, sound_name);  //copy the sound name
     strcat(file_name, ".c");        //add .c at the end
     printf("file_name: %s\r\n", file_name);
     fp = fopen(file_name, "w");     //open a write connection to the file
 
     //WRITE THE SOUND DATA LINE INTO THE C FILE
-    char line_of_code[28+strlen(sound_name)+data_size*3];   //allocate the right amount of space
+    char line_of_code[28+strlen(sound_name)+data_size*5];   //allocate the right amount of space
                                                             //for the line of code, string
     strcpy(line_of_code, "uint32_t ");
     strcat(line_of_code, sound_name);
@@ -123,16 +124,16 @@ int main(int argc, char** argv){
     char temp[2];   //temp char[] to hold the hex values of current sample byte
     //copy each byte into temp then add it and a comma, to line of code
     for(i = 0; i < data_size - 1; i++){
-        sprintf(temp, "%02x", data_little_endian[i]);
+        sprintf(temp, "0x%02x", data_little_endian[i]);
         strcat(line_of_code, temp);
         strcat(line_of_code, ",");
     }
-    sprintf(temp, "%02x", data_little_endian[data_size -1]);    //last byte w/o comma
+    sprintf(temp, "0x%02x", data_little_endian[data_size -1]);    //last byte w/o comma
     strcat(line_of_code, temp);
     strcat(line_of_code, "};\n\n");
     fwrite(line_of_code, sizeof(line_of_code), 1, fp);  //write line to .c file
 
-    printf("%s", line_of_code);
+    //printf("%s", line_of_code);
 
     //WRITE THE NUMBER OF SAMPLES LINE INTO THE C CODE
     char num_samples[5];    //temp array
@@ -144,7 +145,7 @@ int main(int argc, char** argv){
     strcat(line_of_code1, "_numberOfSamples = ");
     strcat(line_of_code1, num_samples);
     fwrite(line_of_code1, sizeof(line_of_code1) + 1, 1, fp);    //write to file
-    printf("%s", line_of_code1);
+    //printf("%s", line_of_code1);
 
     //WRITE THE SAMPLE RATE LINE INTO THE C CODE
     char sample_rate_string[5]; //temp array
@@ -156,7 +157,7 @@ int main(int argc, char** argv){
     strcat(line_of_code2, "_sampleRate = ");
     strcat(line_of_code2, sample_rate_string);
     fwrite(line_of_code2, sizeof(line_of_code2) + 1, 1, fp);    //write to file
-    printf("%s", line_of_code2);
+    //printf("%s", line_of_code2);
 
     fclose(fp);
     return 0;
